@@ -4,6 +4,8 @@ import IconButton from "~/components/admin/IconButton.vue";
 import InputText from "~/components/admin/InputText.vue";
 
 const searchQuery = ref();
+
+const { data } = useFetch("/api/collections/system");
 </script>
 
 <template>
@@ -37,21 +39,25 @@ const searchQuery = ref();
     <main class="flex gap-10 w-[80%] mx-auto py-8">
       <div class="w-[200px] text-primary">
         <ul>
-          <li class="mb-4">
+          <li>
             <Button text="Home" to="/admin" icon="lucide:home" link />
           </li>
-          <li class="mb-4">
+
+          <li
+            v-for="collection in data ?? []"
+            :key="collection.name"
+            class="mt-4"
+          >
             <Button
-              text="Pages"
-              to="/admin/pages"
-              icon="lucide:navigation"
+              :text="collection.display.plural"
+              :to="`/admin/${collection.name}`"
+              :icon="collection.display.icon"
               link
             />
           </li>
-          <li class="mb-4">
-            <Button text="Menus" to="/admin/menus" icon="lucide:menu" link />
-          </li>
         </ul>
+
+        <div class="w-full h-[2px] bg-gray-200 my-4"></div>
       </div>
 
       <div class="flex-1 w-full">

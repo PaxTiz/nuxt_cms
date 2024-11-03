@@ -2,11 +2,11 @@
 const {
   icon,
   to,
-  size = 'normal',
+  size = "normal",
 } = defineProps<{
-  to?: string;
   icon: string;
-  size: 'small' | 'normal';
+  to?: string;
+  size?: "small" | "normal";
   flat?: boolean;
 }>();
 </script>
