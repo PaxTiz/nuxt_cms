@@ -1,9 +1,17 @@
-import { Field } from "~/server/fields/system";
+import {
+  DateTimeField,
+  EnumField,
+  Field,
+  InferField,
+  StringField,
+} from "~/server/fields/system";
 
-export type Collection = {
+type FieldsBaseType = Record<string, Field>;
+
+export type CollectionDefinition<F extends FieldsBaseType> = {
   name: string;
 
-  fields: Record<string, Field>;
+  fields: F;
 
   display: {
     plural: string;
@@ -14,8 +22,21 @@ export type Collection = {
   };
 };
 
-export const defineCollection = (data: Collection): Collection => {
-  data.fields["__id__"] = {
+export type Collection<F extends FieldsBaseType> = CollectionDefinition<F> & {
+  fields: F & {
+    __id: StringField;
+    __status: EnumField<"draft" | "published">;
+    __createdAt: DateTimeField;
+    __updatedAt: DateTimeField;
+  };
+};
+
+export const defineCollection = <F extends FieldsBaseType>(
+  data: CollectionDefinition<F>
+): Collection<F> => {
+  const newData = data as Collection<F>;
+
+  newData.fields["__id"] = {
     type: "string",
     defaultValue: "RANDOM_ID",
     defaultValueFn: () => "",
@@ -28,7 +49,7 @@ export const defineCollection = (data: Collection): Collection => {
     label: "#",
   };
 
-  data.fields["__status__"] = {
+  newData.fields["__status"] = {
     type: "enum",
     values: ["draft", "published"],
     sortable: true,
@@ -41,7 +62,7 @@ export const defineCollection = (data: Collection): Collection => {
     label: "Status",
   };
 
-  data.fields["__createdAt__"] = {
+  newData.fields["__createdAt"] = {
     type: "datetime",
     defaultValue: "NOW",
     defaultValueFn: () => new Date(),
@@ -54,7 +75,7 @@ export const defineCollection = (data: Collection): Collection => {
     label: "Created at",
   };
 
-  data.fields["__updatedAt__"] = {
+  newData.fields["__updatedAt"] = {
     type: "datetime",
     defaultValue: "NOW",
     defaultValueFn: () => new Date(),
@@ -67,5 +88,12 @@ export const defineCollection = (data: Collection): Collection => {
     label: "Updated at",
   };
 
-  return data;
+  return newData;
+};
+
+export type InferCollection<
+  F extends FieldsBaseType,
+  C extends Collection<F>,
+> = {
+  [K in keyof C["fields"]]: InferField<C["fields"][K]>;
 };

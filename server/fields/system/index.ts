@@ -102,3 +102,21 @@ export type Field =
   | RelationField
   | FileField
   | ImageField;
+
+export type InferField<F extends Field> = F extends StringField
+  ? string
+  : F extends FileField
+    ? string
+    : F extends ImageField
+      ? string
+      : F extends RelationField
+        ? string
+        : F extends NumberField
+          ? number
+          : F extends DateTimeField
+            ? Date | string | number
+            : F extends BooleanField
+              ? boolean
+              : F extends EnumField<infer R>
+                ? R
+                : never;

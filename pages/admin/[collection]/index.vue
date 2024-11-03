@@ -55,7 +55,7 @@ const collectionViewMode = ref<"all" | "draft" | "published">("all");
 
   <div>
     <DataTable
-      data-key="__id__"
+      data-key="__id"
       :columns="[...dataTableColumns, { key: 'actions' }]"
       :items="results.items"
       toggle-all
